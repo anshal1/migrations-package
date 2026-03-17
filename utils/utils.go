@@ -86,7 +86,7 @@ func applyMigration(version string, sql string, db *sql.DB) error {
 	return nil
 }
 
-func ConnectToDB(databaseURI string) (*sql.DB, error) {
+func connectToDB(databaseURI string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", databaseURI)
 	if err != nil {
 		return db, err
@@ -111,8 +111,12 @@ func readDir(config MigrationsConfig) ([]os.DirEntry, error) {
 	return allFiles, err
 }
 
-func CreateMigrations(config MigrationsConfig, db *sql.DB) error {
-	err := createMigrationTable(db)
+func CreateMigrations(config MigrationsConfig, dbUri string) error {
+	db, err := connectToDB(dbUri)
+	if err != nil {
+		return err
+	}
+	err = createMigrationTable(db)
 	if err != nil {
 		return err
 	}
